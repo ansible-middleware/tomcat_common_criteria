@@ -20,7 +20,7 @@
       fail_msg: "{{ item.error }} "
       success_msg: "{{ item.success }}"
       quiet: true
-  when: ansible_distribution == 'Fedora'
+  when: ansible_distribution == 'Fedora' or (ansible_distribution == 'RedHat' and ansible_distribution_version >= '8')
 
 - block:
     - name: "Checks compliance {{ item.xmlfile }} ({{ item.xpath }})"
@@ -43,4 +43,4 @@
         fail_msg: "{{ item.error }} "
         success_msg: "{{ item.success }}"
         quiet: true
-  when: ansible_distribution == 'RedHat'
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version < '8'
