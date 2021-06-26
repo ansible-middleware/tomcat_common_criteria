@@ -1,26 +1,26 @@
 ---
 - block:
-  - name: "Checks compliance {{ item.xmlfile }} ({{ item.xpath }})"
-    command: >
-      xpath  -e {{ item.xpath }} {{ item.xmlfile }}
-    register: res
-    changed_when: false
+    - name: "Checks compliance {{ item.xmlfile }} ({{ item.xpath }})"
+      command: >
+        xpath  -e {{ item.xpath }} {{ item.xmlfile }}
+      register: res
+      changed_when: false
 
-  - name: "Display XPath if requested"
-    debug:
-      msg: "{{ res.stdout }}"
-    when: display_xpath_res
+    - name: "Display XPath if requested"
+      debug:
+        msg: "{{ res.stdout }}"
+      when: display_xpath_res
 
-  - name: "Verify compliance of {{ item.xmlfile }}."
-    assert:
-      that:
-        - not res.failed
-        - res.rc == 0
-        - (res.stdout | length == 0) or (item.not_empty_result is defined and item.not_empty_result)
-      fail_msg: "{{ item.error }} "
-      success_msg: "{{ item.success }}"
-      quiet: true
-  when: ansible_distribution == 'Fedora'
+    - name: "Verify compliance of {{ item.xmlfile }}."
+      assert:
+        that:
+          - not res.failed
+          - res.rc == 0
+          - (res.stdout | length == 0) or (item.not_empty_result is defined and item.not_empty_result)
+        fail_msg: "{{ item.error }} "
+        success_msg: "{{ item.success }}"
+        quiet: true
+  when: (ansible_distribution == 'Fedora' or ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and ansible_distribution_version >= '8'
 
 - block:
     - name: "Checks compliance {{ item.xmlfile }} ({{ item.xpath }})"
@@ -39,8 +39,8 @@
         that:
           - not res2.failed
           - res2.rc == 0
-          - (res2.stdout | length != 0) or (item.not_empty_result is defined and item.not_empty_result)
+          - (res2.stdout | length == 0) or (item.not_empty_result is defined and item.not_empty_result)
         fail_msg: "{{ item.error }} "
         success_msg: "{{ item.success }}"
         quiet: true
-  when: ansible_distribution == 'RedHat'
+  when: (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS' or ansible_distribution == 'Fedora')  and ansible_distribution_version < '8'
